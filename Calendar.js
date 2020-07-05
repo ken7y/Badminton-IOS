@@ -30,7 +30,6 @@ getTodayData() {
     console.log("Trying API", this.state);
     axios.get("https://roan-astonishing-dinner.glitch.me/today")
     .then(response => {
-        console.log(response.data);
         this.setState({ response: response.data, loading: false, date: "Today" }, () => {
         this.processHeaders();
       });
@@ -45,7 +44,6 @@ getTomorrowData() {
         console.log("Trying API", this.state);
         axios.get("https://roan-astonishing-dinner.glitch.me/tomorrow")
         .then(response => {
-            console.log(response.data);
             this.setState({ response: response.data, loading: false, date: "Tomorrow" }, () => {
             this.processHeaders();
           });
@@ -58,7 +56,6 @@ getTomorrowData() {
  convertTime12to24 = (time12h) => {
     var  modifier = time12h.slice(-2);
     var time = time12h.substring(0, time12h.length-2);
-    console.log(time + " ::::: TIME");
     let [hours, minutes] = time.split(':');
     if (hours === '12') {
       hours = '00';
@@ -110,7 +107,6 @@ getTomorrowData() {
         var respArr = response[keys[i]];
         if (respArr == "default") { continue; }
         var column = i + 1;
-        console.log("respArr: " + respArr)
         for (var x in respArr){
             var res = respArr[x].split("–");  
             var time = parseInt(this.convertTime12to24(res[0]).substring(0,2));
