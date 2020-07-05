@@ -8,12 +8,9 @@ export default class ExampleFour extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      tableHead: props.tableHead,
+      tableHead: ["Loading"],
       tableData: [
-        ['1', '2', '3'],
-        ['a', 'b', 'c' ],
-        ['1', '2', '3'],
-        ['a', 'b', 'c']
+        ["Loading"]
       ]
       ,items: [], 
       loading: true,
@@ -25,33 +22,31 @@ export default class ExampleFour extends Component {
 
  componentDidMount() {
     console.log('component did mount')
-    try {
-        console.log("Trying API", this.state);
-        // const response =  fetch('https://serene-ocean-36002.herokuapp.com/tomorrow');
-        axios.get("https://serene-ocean-36002.herokuapp.com/today")
-        .then(response => {
-            console.log("--------------Done API----------------");
-            console.log(response.data);
-            this.setState({ response: response.data, loading: false }, () => {
-            console.log("App Component - State Updated", this.state);
-            this.processHeaders();
-          });
-        })
-    } catch(err) {
-        console.log("Error fetching data-----------", err);
-    }
+    this.getTodayData();
+}
+
+getTodayData() {
+  try {
+    console.log("Trying API", this.state);
+    axios.get("https://roan-astonishing-dinner.glitch.me/today")
+    .then(response => {
+        console.log(response.data);
+        this.setState({ response: response.data, loading: false, date: "Today" }, () => {
+        this.processHeaders();
+      });
+    })
+} catch(err) {
+    console.log("Error fetching data-----------", err);
+}
 }
 
 getTomorrowData() {
     try {
         console.log("Trying API", this.state);
-        // const response =  fetch('https://serene-ocean-36002.herokuapp.com/tomorrow');
-        axios.get("https://serene-ocean-36002.herokuapp.com/tomorrow")
+        axios.get("https://roan-astonishing-dinner.glitch.me/tomorrow")
         .then(response => {
-            console.log("--------------Done API----------------");
             console.log(response.data);
-            this.setState({ response: response.data, loading: false }, () => {
-            console.log("App Component - State Updated", this.state);
+            this.setState({ response: response.data, loading: false, date: "Tomorrow" }, () => {
             this.processHeaders();
           });
         })
@@ -61,8 +56,6 @@ getTomorrowData() {
 }
 
  convertTime12to24 = (time12h) => {
-    // const [time, modifier] = time12h.split(' ');
-    
     var  modifier = time12h.slice(-2);
     var time = time12h.substring(0, time12h.length-2);
     console.log(time + " ::::: TIME");
@@ -76,11 +69,11 @@ getTomorrowData() {
     return `${hours}:${minutes}`;
   }
 
-  
 
   _alertIndex(index) {
     Alert.alert(`This is row ${this.processHeaders()}`);
   }
+
   processHeaders() { 
     var temp = this.state.response; 
     var keys = [];
@@ -120,14 +113,7 @@ getTomorrowData() {
         console.log("respArr: " + respArr)
         for (var x in respArr){
             var res = respArr[x].split("–");  
-            // console.log(respArr[x] + "   xxxxxx   " ) 
-
-            // console.log(res[0] + "   00000   " ) 
             var time = parseInt(this.convertTime12to24(res[0]).substring(0,2));
-            // console.log(time)
-            // console.log(column)
-            // console.log(arr)
-
             arr[time - 7][column] = "FREE"
             this.setState({
                 tableData: arr,
@@ -139,12 +125,10 @@ getTomorrowData() {
 
   render() {
     const state = this.state;
-    const element = (data, index) => (
-      <TouchableOpacity onPress={() => this._alertIndex(index)}>
-        <View style={styles.btn}>
-          <Text style={styles.btnText}>button</Text>
+    const elementFree = (data, index) => (
+        <View >
+          <Text style={styles.freeText}>FREE</Text>
         </View>
-       </TouchableOpacity>
     );
  
     return (
@@ -158,7 +142,7 @@ getTomorrowData() {
               <TableWrapper key={index} style={styles.row}>
                 {
                   rowData.map((cellData, cellIndex) => (
-                    <Cell key={cellIndex} data={cellData == 3 ? element(cellData, index) : cellData} textStyle={styles.text}/>
+                    <Cell key={cellIndex} data= {cellData == "FREE" ? elementFree() : cellData} textStyle={styles.text}/>
                   ))
                 }
               </TableWrapper>
@@ -166,22 +150,36 @@ getTomorrowData() {
           }
         </Table>
 
-        <TouchableOpacity onPress={() => this._alertIndex()}>
+
+        <View style={styles.buttonContainer} >        
+        <TouchableOpacity onPress={() => this.getTodayData()}>
+        <View style={styles.btn}>
+          <Text style={styles.btnText}>Today</Text>
+        </View>
+       </TouchableOpacity>
+
+        <TouchableOpacity onPress={() => this.getTomorrowData()}>
         <View style={styles.btn}>
           <Text style={styles.btnText}>Tomorrow</Text>
         </View>
        </TouchableOpacity>
+       </View>
+
+
       </View>
     )
   }
 }
  
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 4, backgroundColor: '#fff' },
+  container: { flex: 1, padding: 4, backgroundColor: '#fff'},
+  buttonContainer: { flex: 1, flexDirection:"row", justifyContent: "space-around", paddingTop: 14},
   head: { height: 40, backgroundColor: '#228B97' },
   header: {fontSize:24, textAlign:"center", paddingBottom: 20 },
-  text: { margin: 12 },
+  text: { margin: 11, textAlign: "center" },
   row: { flexDirection: 'row', backgroundColor: '#FFF1C1' },
-  btn: { width: 58, height: 18, backgroundColor: '#78B7BB',  borderRadius: 2 },
-  btnText: { textAlign: 'center', color: '#fff' }
+  btn: { width: 88, height: 24, backgroundColor: '#78B7BB',  borderRadius: 2},
+  btnText: { textAlign: 'center', color: '#fff', fontSize: 18 },
+  freeText: {color: '#32CD32', textAlign: 'center' },
+  takenText: {color: '#B22222', textAlign: 'center' }
 });
